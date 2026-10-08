@@ -1,1 +1,93 @@
-<!-- Use your existing index.html. Only script.js needs replacement. -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#070909">
+  <meta name="description" content="PCW Study — Priyanshu Raj study hub.">
+  <title>PRIYANSHU RAJ — PCW STUDY</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"></div>
+  <header class="navbar">
+    <a class="brand" href="#home" aria-label="PCW Study home"><span>PCW</span> STUDY</a>
+    <button class="menu-btn" id="menuBtn" type="button" aria-label="Open navigation" aria-expanded="false">☰</button>
+    <nav id="navLinks" aria-label="Main navigation">
+      <a href="#categories">Categories</a>
+      <a href="#saved">Saved</a>
+      <a href="#about">About</a>
+      <a href="#download">Download</a>
+      <a href="#profile">Profile</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-art" aria-hidden="true">
+        <div class="symbiote">
+          <span class="eye eye-left"></span><span class="eye eye-right"></span>
+          <span class="mouth"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+        </div>
+        <span class="tendril one"></span><span class="tendril two"></span><span class="tendril three"></span>
+      </div>
+      <div class="hero-content">
+        <p class="eyebrow">PCW STUDY • LEARN • BUILD</p>
+        <h1>PRIYANSHU<br><span>RAJ</span></h1>
+        <p class="hero-text">A focused home for courses, study resources, useful links and the things that keep your grind moving.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#categories">Explore Categories</a>
+          <a class="btn ghost" href="#about">About</a>
+        </div>
+      </div>
+      <div class="scroll-indicator">SCROLL ↓</div>
+    </section>
+
+    <section class="section" id="categories">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">LEARNING HUB</p>
+          <h2>Categories</h2>
+        </div>
+        <span class="count" id="categoryCount">0 resources</span>
+      </div>
+      <p class="section-sub">Everything is loaded from the Cloudflare KV-backed API. Save your favourites locally on this device.</p>
+      <div class="cards" id="categoryGrid" aria-live="polite">
+        <div class="state-card"><span class="loader"></span><p>Loading categories…</p></div>
+      </div>
+    </section>
+
+    <section class="section saved-section" id="saved">
+      <div class="section-head">
+        <div><p class="eyebrow">YOUR PICKS</p><h2>Saved</h2></div>
+      </div>
+      <div id="savedList" class="saved-list"><p class="empty">No saved categories yet. Tap ☆ on a course to save it.</p></div>
+    </section>
+
+    <section class="split-section" id="about">
+      <div><p class="eyebrow">ABOUT</p><h2>BUILT FOR<br><span>YOUR GRIND.</span></h2></div>
+      <p>PCW Study is a fast, minimal study hub built around your resources. Categories are managed globally through the admin panel, while Saved stays personal to each browser.</p>
+    </section>
+
+    <section class="download" id="download">
+      <div>
+        <p class="eyebrow" id="downloadEyebrow">MOBILE</p>
+        <h2 id="downloadTitle">Take it with you.</h2>
+        <p id="downloadText">Put your Android APK link here and use the button below.</p>
+      </div>
+      <a class="btn dark" id="downloadButton" href="#" target="_blank" rel="noopener" hidden>Download APK ↓</a>
+    </section>
+
+    <section class="profile" id="profile">
+      <div class="avatar">PR</div>
+      <div><p class="eyebrow">PROFILE</p><h2>Priyanshu Raj</h2><p>Student • Creator • Learner</p></div>
+    </section>
+  </main>
+
+  <footer>© 2026 Priyanshu Raj · PCW Study <a href="admin.html">Admin</a></footer>
+  <script src="script.js" defer></script>
+</body>
+</html>

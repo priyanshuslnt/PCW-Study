@@ -3,10 +3,10 @@ const SETTINGS_KEY = "settings";
 
 const DEFAULT_SETTINGS = {
   downloadEyebrow: "MOBILE",
-  downloadTitle: "Take it<br>with you.",
-  downloadText: "Put your Android APK here and use the button below to download it.",
+  downloadTitle: "Take it with you.",
+  downloadText: "Put your Android APK link here and use the button below.",
   downloadButton: "Download APK ↓",
-  downloadUrl: "app-release.apk"
+  downloadUrl: ""
 };
 
 function json(data, status = 200) {
@@ -20,100 +20,106 @@ function json(data, status = 200) {
 }
 
 function authorized(request, env) {
-  return !!env.ADMIN_PASSWORD &&
-    request.headers.get("X-Admin-Password") === env.ADMIN_PASSWORD;
+  const supplied = request.headers.get("X-Admin-Password");
+  return Boolean(env.ADMIN_PASSWORD && supplied && supplied === env.ADMIN_PASSWORD);
 }
 
 async function getCategories(env) {
-  const raw = await env.CATEGORIES.get(CATEGORIES_KEY);
-  if (!raw) return [];
-  try { return JSON.parse(raw); } catch { return []; }
+  try {
+    const raw = await env.CATEGORIES.get(CATEGORIES_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
 }
 
 async function getSettings(env) {
-  const raw = await env.CATEGORIES.get(SETTINGS_KEY);
-  if (!raw) return DEFAULT_SETTINGS;
-  try { return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) }; }
-  catch { return DEFAULT_SETTINGS; }
+  try {
+    const raw = await env.CATEGORIES.get(SETTINGS_KEY);
+    if (!raw) return { ...DEFAULT_SETTINGS };
+    const parsed = JSON.parse(raw);
+    return { ...DEFAULT_SETTINGS, ...(parsed && typeof parsed === "object" ? parsed : {}) };
+  } catch {
+    return { ...DEFAULT_SETTINGS };
+  }
+}
+
+function cleanCategory(input) {
+  return {
+    id: String(input.id || crypto.randomUUID()),
+    name: String(input.name || "").trim().slice(0, 100),
+    icon: String(input.icon || "📚").trim().slice(0, 12),
+    logo: String(input.logo || "").trim().slice(0, 2000),
+    url: String(input.url || "").trim().slice(0, 2000),
+    description: String(input.description || "").trim().slice(0, 500)
+  };
 }
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (request.method === "GET" && url.pathname === "/api/admin/check") {
-      if (!authorized(request, env)) return json({ error: "Unauthorized" }, 401);
-      return json({ ok: true });
-    }
+    try {
+      if (request.method === "GET" && url.pathname === "/api/admin/check") {
+        return authorized(request, env) ? json({ ok: true }) : json({ error: "Unauthorized" }, 401);
+      }
 
-    if (request.method === "GET" && url.pathname === "/api/categories") {
-      return json(await getCategories(env));
-    }
+      if (request.method === "GET" && url.pathname === "/api/categories") {
+        return json(await getCategories(env));
+      }
 
-    if (request.method === "PUT" && url.pathname === "/api/categories") {
-      if (!authorized(request, env)) return json({ error: "Unauthorized" }, 401);
-      try {
-        const item = await request.json();
-        if (!item || !item.name || !item.url) {
-          return json({ error: "name and url are required." }, 400);
-        }
+      if (request.method === "PUT" && url.pathname === "/api/categories") {
+        if (!authorized(request, env)) return json({ error: "Unauthorized" }, 401);
+        let input;
+        try { input = await request.json(); } catch { return json({ error: "Invalid JSON." }, 400); }
+        const category = cleanCategory(input || {});
+        if (!category.name || !category.url) return json({ error: "Category name and website URL are required." }, 400);
 
         const categories = await getCategories(env);
-        const category = {
-          id: item.id || crypto.randomUUID(),
-          name: String(item.name).trim(),
-          url: String(item.url).trim(),
-          icon: String(item.icon || "📚").trim(),
-          logo: String(item.logo || "").trim(),
-          description: String(item.description || "").trim()
-        };
-
-        const index = categories.findIndex(c => String(c.id) === String(category.id));
+        const index = categories.findIndex(item => String(item.id) === category.id);
         if (index >= 0) categories[index] = category;
         else categories.push(category);
 
         await env.CATEGORIES.put(CATEGORIES_KEY, JSON.stringify(categories));
         return json({ ok: true, category, categories });
-      } catch {
-        return json({ error: "Invalid category data." }, 400);
       }
-    }
 
-    if (request.method === "DELETE" && url.pathname === "/api/categories") {
-      if (!authorized(request, env)) return json({ error: "Unauthorized" }, 401);
-      const id = url.searchParams.get("id");
-      if (!id) return json({ error: "Missing id." }, 400);
+      if (request.method === "DELETE" && url.pathname === "/api/categories") {
+        if (!authorized(request, env)) return json({ error: "Unauthorized" }, 401);
+        const id = url.searchParams.get("id");
+        if (!id) return json({ error: "Missing category id." }, 400);
+        const categories = await getCategories(env);
+        const updated = categories.filter(item => String(item.id) !== String(id));
+        await env.CATEGORIES.put(CATEGORIES_KEY, JSON.stringify(updated));
+        return json({ ok: true, categories: updated });
+      }
 
-      const categories = await getCategories(env);
-      const updated = categories.filter(c => String(c.id) !== String(id));
-      await env.CATEGORIES.put(CATEGORIES_KEY, JSON.stringify(updated));
-      return json({ ok: true, categories: updated });
-    }
+      if (request.method === "GET" && url.pathname === "/api/settings") {
+        return json(await getSettings(env));
+      }
 
-    if (request.method === "GET" && url.pathname === "/api/settings") {
-      return json(await getSettings(env));
-    }
-
-    if (request.method === "POST" && url.pathname === "/api/settings") {
-      if (!authorized(request, env)) return json({ error: "Unauthorized" }, 401);
-      try {
-        const incoming = await request.json();
+      if (request.method === "POST" && url.pathname === "/api/settings") {
+        if (!authorized(request, env)) return json({ error: "Unauthorized" }, 401);
+        let incoming;
+        try { incoming = await request.json(); } catch { return json({ error: "Invalid JSON." }, 400); }
+        incoming = incoming && typeof incoming === "object" ? incoming : {};
         const settings = {
-          ...DEFAULT_SETTINGS,
-          ...incoming,
-          downloadEyebrow: String(incoming.downloadEyebrow ?? DEFAULT_SETTINGS.downloadEyebrow),
-          downloadTitle: String(incoming.downloadTitle ?? DEFAULT_SETTINGS.downloadTitle),
-          downloadText: String(incoming.downloadText ?? DEFAULT_SETTINGS.downloadText),
-          downloadButton: String(incoming.downloadButton ?? DEFAULT_SETTINGS.downloadButton),
-          downloadUrl: String(incoming.downloadUrl ?? DEFAULT_SETTINGS.downloadUrl)
+          downloadEyebrow: String(incoming.downloadEyebrow ?? DEFAULT_SETTINGS.downloadEyebrow).trim().slice(0, 80),
+          downloadTitle: String(incoming.downloadTitle ?? DEFAULT_SETTINGS.downloadTitle).trim().slice(0, 160),
+          downloadText: String(incoming.downloadText ?? DEFAULT_SETTINGS.downloadText).trim().slice(0, 600),
+          downloadButton: String(incoming.downloadButton ?? DEFAULT_SETTINGS.downloadButton).trim().slice(0, 80),
+          downloadUrl: String(incoming.downloadUrl ?? DEFAULT_SETTINGS.downloadUrl).trim().slice(0, 2000)
         };
         await env.CATEGORIES.put(SETTINGS_KEY, JSON.stringify(settings));
         return json({ ok: true, settings });
-      } catch {
-        return json({ error: "Invalid settings." }, 400);
       }
+    } catch {
+      return json({ error: "Server error." }, 500);
     }
 
+    // All non-API requests are handled by Cloudflare's static asset binding.
     return env.ASSETS.fetch(request);
   }
 };
