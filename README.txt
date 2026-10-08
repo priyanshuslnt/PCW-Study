@@ -1,12 +1,19 @@
-PCW STUDY - USE THIS FOLDER
+PCW STUDY — ANIME RESPONSIVE VERSION
 
-1) Open script.js.
-2) Find: YAHAN SE APNE BATCH ADD KARO
-3) Copy this format:
-   { category: "Physics Wallah", name: "My Batch", url: "https://example.com" },
-4) Save (Ctrl+S).
-5) Open index.html.
+Desktop + tablet + phone responsive layout.
+Includes anime/night-sky theme, motivation, study timer, search, platforms, batches, resources, notes and important links.
 
-category must exactly match one of the 46 preloaded categories.
-url is the link opened by the Open button.
-You can add unlimited batches/resources.
+ADD COURSE:
+Open script.js and find:
+const resources = [];
+
+Example:
+{category:"Physics Wallah",name:"Arjuna JEE 2026",type:"JEE",tag:"Popular",url:"https://example.com"}
+
+Use only legitimate/authorized URLs.
+
+LOGOS:
+Mapped platforms load a favicon/logo from their official domain. Other categories show initials. Add more domains inside logoDomains in script.js.
+
+DEPLOY:
+Replace the files in your existing GitHub repository with this version. Cloudflare Pages will redeploy after the commit.

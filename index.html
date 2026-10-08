@@ -1,7 +1,63 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PCW Study</title><link rel="stylesheet" href="styles.css"></head><body>
-<header><div class="brand"><b>PCW</b><div><strong>PCW Study</strong><small>Priyanshu Course World</small><small>Owner - Priyanshu Raj</small></div></div><button id="theme">☀️</button></header>
-<main><section class="hero"><div class="ghost">PCW</div><h1>Learn. Explore. Grow.</h1><p>All your study resources in one place.</p><input id="search" placeholder="Search category or batch..."></section>
-<section id="catSection"><div class="head"><h2>Categories</h2><span id="count"></span></div><div id="categories" class="grid"></div></section>
-<section id="resSection" class="hidden"><button id="back">← All Categories</button><div class="head"><h2 id="title"></h2><span id="rcount"></span></div><div id="resources"></div></section></main>
-<nav><button onclick="showCats()">⌂<small>Home</small></button><button onclick="showCats()">▦<small>Categories</small></button><button onclick="document.getElementById('search').focus()">⌕<small>Search</small></button></nav>
-<script src="script.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050817"><title>PCW Study — Priyanshu Course World</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#" onclick="showHome();return false;">
+    <div class="brand-mark">PCW</div>
+    <div><div class="brand-title">PCW Study</div><div class="brand-sub">Priyanshu Course World</div><div class="owner">Owner - Priyanshu Raj</div></div>
+  </a>
+  <div class="top-search">⌕ <input id="searchInput" type="search" placeholder="Search courses, batches, platforms..." oninput="renderSearch(this.value)"></div>
+  <nav class="top-nav"><button onclick="showHome()">⌂ Home</button><button onclick="showSaved()">♡ Saved</button><button onclick="toggleTheme()">☾</button></nav>
+</header>
+<div class="layout">
+<aside class="sidebar">
+  <button class="side active" onclick="showHome()">🏠 <span>Home</span></button>
+  <button class="side" onclick="showCategories()">▦ <span>All Platforms</span></button>
+  <button class="side" onclick="filterType('JEE')">🚀 <span>JEE</span></button>
+  <button class="side" onclick="filterType('NEET')">🩺 <span>NEET</span></button>
+  <button class="side" onclick="filterType('Board')">📚 <span>Boards (Class 9-12)</span></button>
+  <button class="side" onclick="showMotivation()">⚡ <span>Motivation</span></button>
+  <button class="side" onclick="showResources()">📁 <span>Study Resources</span></button>
+  <button class="side" onclick="showNotes()">📄 <span>Notes & PDFs</span></button>
+  <button class="side" onclick="showLinks()">🔗 <span>Important Links</span></button>
+  <button class="side" onclick="showAbout()">ⓘ <span>About</span></button>
+  <div class="side-art">Dream.<br>Plan.<br>Study.<br><b>Achieve. ✦</b></div>
+</aside>
+<main>
+<section class="hero">
+  <div class="hero-art"></div><div class="hero-content">
+    <div class="eyebrow">✦ PCW STUDY</div><h1>Your Dreams<br><em>Are Valid.</em></h1>
+    <p>Study today → Freedom tomorrow.</p>
+    <div class="hero-actions"><button onclick="showCategories()">🎓 Top Platforms</button><button onclick="showResources()">⭐ Free Resources</button><button onclick="showMotivation()">💜 Motivation</button></div>
+  </div>
+  <div class="hero-quote">“Discipline is the<br>real freedom.”<small>— PCW Study</small></div>
+</section>
+<section class="content-grid">
+<div class="main-column">
+<section class="section-head"><div><h2>🚀 Explore Platforms</h2><p>Courses, batches & resources in one place.</p></div><button class="outline" onclick="showCategories()">View All →</button></section>
+<div id="platformGrid" class="platform-grid"></div>
+<section class="section-head second"><div><h2>🔥 Popular Batches</h2><p>Your added courses appear here automatically.</p></div></section>
+<div id="resourceGrid" class="resource-grid"></div>
+<div class="feature-row">
+<button onclick="showResources()" class="feature-card resource-bg"><b>📚 Study Resources</b><span>Notes · PDFs · Question Papers</span><i>Explore →</i></button>
+<button onclick="showMotivation()" class="feature-card motivation-bg"><b>🕊 Motivation Zone</b><span>Quotes · Success · Mindset</span><i>Get inspired →</i></button>
+<button onclick="showLinks()" class="feature-card links-bg"><b>🔗 Important Links</b><span>Official websites · Useful links</span><i>View links →</i></button>
+</div>
+</div>
+<aside class="right-column">
+<div class="quote-card mini-art"><div>“Small steps.<br>Big dreams.”</div></div>
+<div class="panel"><h3>💡 Daily Motivation</h3><p id="dailyQuote"></p><small>— PCW Study</small></div>
+<div class="panel timer-panel"><h3>⏱ Study Timer</h3><div class="timer-mode">Focus mode ON</div><div id="timer">02:00:00</div><div class="timer-buttons"><button onclick="startTimer()">Start</button><button onclick="pauseTimer()">Pause</button><button onclick="resetTimer()">Reset</button></div></div>
+<div class="panel"><h3>⚡ Quick Links</h3><div class="quick-links"><a href="#" target="_blank">▶<span>YouTube</span></a><a href="#" target="_blank">➤<span>Telegram</span></a><a href="#" target="_blank">☘<span>WhatsApp</span></a><a href="#" target="_blank">🌐<span>Website</span></a></div></div>
+<div class="quote-card bottom-art">Keep going.<br>Your future self<br>will thank you.</div>
+</aside>
+</section>
+</main></div>
+<nav class="mobile-nav"><button onclick="showHome()">⌂<span>Home</span></button><button onclick="showCategories()">▦<span>Courses</span></button><button onclick="showMotivation()">⚡<span>Motivation</span></button><button onclick="showResources()">📁<span>Resources</span></button><button onclick="showSaved()">♡<span>Saved</span></button></nav>
+<script src="script.js"></script>
+</body></html>
