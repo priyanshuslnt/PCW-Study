@@ -1,36 +1,128 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PCW Study — Priyanshu Course World</title>
-<link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#050505">
+  <title>Priyanshu Raj — Study Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="bg-art">
-  <div class="iron-figure">
-    <div class="helmet"><i></i><b></b></div>
-    <div class="chest"><span></span></div>
-    <div class="shoulder left"></div><div class="shoulder right"></div>
+  <div class="bg-noise"></div>
+
+  <header class="navbar">
+    <a class="brand" href="#home">PR<span>.</span></a>
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+    <nav id="navLinks">
+      <a href="#categories">Categories</a>
+      <a href="#saved">Saved</a>
+      <a href="#about">About</a>
+      <a href="#download">Download</a>
+      <a href="#profile">Profile</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-art" aria-hidden="true">
+        <div class="symbiote-head">
+          <div class="eye eye-left"></div>
+          <div class="eye eye-right"></div>
+          <div class="mouth">
+            <span class="tooth t1"></span><span class="tooth t2"></span><span class="tooth t3"></span>
+            <span class="tooth t4"></span><span class="tooth t5"></span><span class="tooth t6"></span>
+          </div>
+        </div>
+        <div class="tendril t1"></div><div class="tendril t2"></div><div class="tendril t3"></div>
+      </div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <p class="eyebrow">STUDY • LEARN • BUILD</p>
+        <h1>PRIYANSHU<br><span>RAJ</span></h1>
+        <p class="hero-text">Your personal study hub for courses, resources, links and everything you need in one place.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#categories">Explore Courses</a>
+          <a class="btn ghost" href="#about">About Me</a>
+        </div>
+      </div>
+      <div class="scroll">SCROLL ↓</div>
+    </section>
+
+    <section class="section" id="categories">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">LEARNING HUB</p>
+          <h2>Categories</h2>
+        </div>
+        <button class="btn small" id="addBtn">+ Add Category</button>
+      </div>
+      <p class="section-sub">Add your own courses. Each card can open any URL you choose.</p>
+      <div class="cards" id="categoryGrid"></div>
+    </section>
+
+    <section class="section saved-section" id="saved">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">YOUR PICKS</p>
+          <h2>Saved</h2>
+        </div>
+      </div>
+      <div id="savedList" class="saved-list">
+        <p class="empty">No saved categories yet. Tap ☆ on a course to save it.</p>
+      </div>
+    </section>
+
+    <section class="split-section" id="about">
+      <div>
+        <p class="eyebrow">ABOUT</p>
+        <h2>Built for<br><span>your grind.</span></h2>
+      </div>
+      <p>Priyanshu Raj Study Hub is a clean, fast and customizable home for your learning resources. Everything is stored in your browser, so you can edit categories without needing a database.</p>
+    </section>
+
+    <section class="download" id="download">
+      <div>
+        <p class="eyebrow">MOBILE</p>
+        <h2>Take it<br>with you.</h2>
+        <p>Put your Android APK in this folder and name it <b>app-release.apk</b> to enable the download button.</p>
+      </div>
+      <a class="btn primary" href="app-release.apk" download>Download APK ↓</a>
+    </section>
+
+    <section class="profile" id="profile">
+      <div class="avatar">PR</div>
+      <div>
+        <p class="eyebrow">PROFILE</p>
+        <h2>Priyanshu Raj</h2>
+        <p>Student • Creator • Learner</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2026 Priyanshu Raj. Made for learning.</footer>
+
+  <div class="modal" id="modal">
+    <div class="modal-box">
+      <button class="close" id="closeBtn">×</button>
+      <p class="eyebrow">CUSTOMIZE</p>
+      <h3 id="modalTitle">Add Category</h3>
+      <form id="categoryForm">
+        <input type="hidden" id="editId">
+        <label>Name<input id="name" required placeholder="e.g. Web Development"></label>
+        <label>Description<input id="description" placeholder="Short description"></label>
+        <label>URL<input id="url" type="url" required placeholder="https://example.com"></label>
+        <label>Icon / Emoji<input id="icon" maxlength="4" placeholder="💻"></label>
+        <div class="form-actions">
+          <button type="button" class="btn danger" id="deleteBtn" hidden>Delete</button>
+          <button class="btn primary" type="submit">Save Category</button>
+        </div>
+      </form>
+    </div>
   </div>
-  <div class="energy e1"></div><div class="energy e2"></div>
-</div>
 
-<header>
-  <div class="logo-mark">PCW</div>
-  <div>
-    <h1>PCW Study</h1>
-    <p>Priyanshu Course World</p>
-    <small>Owner — Priyanshu Raj</small>
-  </div>
-</header>
-
-<main>
-  <div class="search"><span>⌕</span><input id="search" placeholder="Search course / platform..."></div>
-  <div class="title"><span>ALL COURSES</span><b>Explore All Platforms</b></div>
-  <section id="courses"></section>
-</main>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
