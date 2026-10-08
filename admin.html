@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — Priyanshu Raj</title><link rel="stylesheet" href="style.css">
+<style>
+.admin-wrap{max-width:850px;margin:0 auto;padding:110px 6% 60px}.admin-card{background:#101010;border:1px solid #292929;border-radius:10px;padding:25px;margin-top:25px}.admin-card h2{font-family:Anton;font-size:42px;margin:0 0 10px}.admin-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.admin-card input{width:100%;background:#080808;border:1px solid #333;color:#fff;padding:13px;border-radius:5px;margin:6px 0 12px}.admin-card label{font-size:12px;color:#aaa}.admin-list{margin-top:25px}.admin-item{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #252525;padding:14px 0;gap:15px}.admin-item button{border:0;background:#351014;color:#fff;padding:9px 12px;border-radius:4px;cursor:pointer}.back{color:#ff3038;text-decoration:none;font-size:12px;font-weight:800}.locked{color:#888;line-height:1.6}.admin-note{font-size:12px;color:#777}@media(max-width:650px){.admin-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="navbar"><a class="brand" href="index.html">PR<span>.</span></a><a class="back" href="index.html">← BACK TO SITE</a></header>
+<main class="admin-wrap">
+<p class="eyebrow">PRIVATE AREA</p><h1>ADMIN PANEL</h1>
+<div class="admin-card" id="loginBox">
+<h2>Owner Login</h2><p class="locked">Public visitors do not get an Add Category button. Use this private page to manage categories.</p>
+<label>Password<input id="pass" type="password" placeholder="Enter admin password"></label>
+<button class="btn primary" id="login">Login</button>
+<p class="admin-note">Default password: <b>change-me</b> — change it in admin.html before uploading.</p>
+</div>
+<div class="admin-card" id="panel" hidden>
+<h2>Categories</h2>
+<form id="form">
+<div class="admin-row"><label>Name<input id="name" required></label><label>Icon<input id="icon" maxlength="4" placeholder="📘"></label></div>
+<div class="admin-row"><label>Description<input id="desc"></label><label>URL<input id="url" type="url" required></label></div>
+<button class="btn primary">Add / Update</button>
+</form>
+<div class="admin-list" id="list"></div>
+</div>
+</main>
+<script>
+const PASSWORD="change-me";
+let cats=JSON.parse(localStorage.getItem("pr_categories")||"[]");
+let editing=null;
+const $=id=>document.getElementById(id);
+$("login").onclick=()=>{if($("pass").value===PASSWORD){$("loginBox").hidden=true;$("panel").hidden=false;render()}else alert("Wrong password")};
+function save(){localStorage.setItem("pr_categories",JSON.stringify(cats));render()}
+function render(){ $("list").innerHTML=cats.map(c=>`<div class="admin-item"><span>${c.icon||"📘"} <b>${esc(c.name)}</b><br><small>${esc(c.url)}</small></span><span><button onclick="edit('${c.id}')">Edit</button> <button onclick="del('${c.id}')">Delete</button></span></div>`).join("")}
+function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+window.edit=id=>{let c=cats.find(x=>x.id===id);if(!c)return;editing=id;$("name").value=c.name;$("desc").value=c.description||"";$("url").value=c.url;$("icon").value=c.icon||"📘"}
+window.del=id=>{if(confirm("Delete this category?")){cats=cats.filter(x=>x.id!==id);save()}}
+$("form").onsubmit=e=>{e.preventDefault();let c={id:editing||"cat_"+Date.now(),name:$("name").value.trim(),description:$("desc").value.trim(),url:$("url").value.trim(),icon:$("icon").value.trim()||"📘"};cats=editing?cats.map(x=>x.id===editing?c:x):[...cats,c];editing=null;e.target.reset();save()}
+</script>
+</body></html>

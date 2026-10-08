@@ -1,26 +1,18 @@
 PRIYANSHU RAJ STUDY HUB
 =======================
 
-Upload all files in this folder to your static website/project.
+PUBLIC SITE
+- Public visitors can only view/open categories and save them locally.
+- The "+ Add Category" control is NOT shown on the public homepage.
 
-MAIN FILES
-- index.html  -> website
-- style.css   -> design
-- script.js   -> category editor + saved system
+ADMIN
+- Open admin.html to manage categories.
+- Change the default password "change-me" inside admin.html before uploading.
+- Add, edit and delete categories from the admin page.
 
-CUSTOM CATEGORIES
-1. Open the website.
-2. Click "+ Add Category".
-3. Enter name, description and URL.
-4. Click Save Category.
-5. Use the pencil button to edit or Delete.
-
-Categories and saved items are stored in the visitor's browser using localStorage.
+IMPORTANT
+This package is a static frontend. The admin password is client-side, so it is not strong server-side security.
+Also, localStorage changes are browser-specific. If you need ONE admin account whose category changes automatically appear for ALL visitors, connect the admin page to a Cloudflare Worker/KV/D1 (or another backend).
 
 APK
-Put your Android APK in this same folder and name it:
-app-release.apk
-Then the Download APK button will work.
-
-NOTE
-The hero artwork is an original CSS-made dark symbiote-style design. It does not include official Marvel/Venom artwork.
+Put your Android APK in this same folder as app-release.apk.
