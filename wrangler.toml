@@ -1,0 +1,11 @@
+name = "pcw-study"
+main = "worker.js"
+compatibility_date = "2026-10-08"
+
+[assets]
+directory = "."
+binding = "ASSETS"
+
+[[kv_namespaces]]
+binding = "CATEGORIES"
+id = "4fa0701afb484c8ca6b948b45053f3be"

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Priyanshu Raj — Admin</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#070707;color:#fff;min-height:100vh}
+    .wrap{width:min(1000px,92%);margin:0 auto;padding:32px 0 60px}
+    h1{margin:0 0 8px;font-size:32px}
+    .muted{color:#aaa}
+    .panel{background:#111;border:1px solid #292929;border-radius:16px;padding:22px;margin-top:20px}
+    input,button{font:inherit}
+    input{width:100%;padding:13px 14px;background:#080808;border:1px solid #333;border-radius:10px;color:#fff;outline:none}
+    input:focus{border-color:#777}
+    button{padding:12px 16px;border:0;border-radius:10px;background:#fff;color:#000;font-weight:700;cursor:pointer}
+    button.danger{background:#321313;color:#ffb5b5;border:1px solid #632525}
+    button.secondary{background:#222;color:#fff;border:1px solid #444}
+    form{display:grid;gap:12px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+    .item{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid #252525}
+    .item:last-child{border-bottom:0}
+    .info strong{display:block;font-size:17px}
+    .info small{display:block;color:#999;margin-top:4px;word-break:break-all}
+    .badge{font-size:22px;margin-right:8px}
+    #app{display:none}
+    #status{margin-top:12px;min-height:20px;color:#bbb}
+    a{color:#fff}
+    @media(max-width:650px){.grid{grid-template-columns:1fr}.item{align-items:flex-start;flex-direction:column}.actions{width:100%}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Priyanshu Raj — Admin</h1>
+  <div class="muted">Manage the categories shown on the public study website.</div>
+
+  <section id="login" class="panel">
+    <h2>Admin Login</h2>
+    <form id="loginForm">
+      <input id="password" type="password" placeholder="Admin password" autocomplete="current-password" required>
+      <button type="submit">Login</button>
+    </form>
+    <div id="loginStatus"></div>
+  </section>
+
+  <section id="app">
+    <div class="panel">
+      <h2>Add Category</h2>
+      <form id="addForm">
+        <div class="grid">
+          <input id="name" placeholder="Category name" required>
+          <input id="icon" placeholder="Icon, e.g. 📚" value="📚">
+        </div>
+        <input id="url" type="url" placeholder="https://example.com" required>
+        <input id="description" placeholder="Short description (optional)">
+        <div class="actions">
+          <button type="submit">Add Category</button>
+          <button type="button" class="secondary" id="logout">Logout</button>
+          <a href="/" style="padding:12px 4px">← Open website</a>
+        </div>
+      </form>
+      <div id="status"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Current Categories</h2>
+      <div id="list"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+  let password = sessionStorage.getItem("pcw_admin_password") || "";
+  let categories = [];
+
+  const $ = id => document.getElementById(id);
+
+  function showApp(show) {
+    $("login").style.display = show ? "none" : "block";
+    $("app").style.display = show ? "block" : "none";
+  }
+
+  async function api(path, options = {}) {
+    const headers = Object.assign({}, options.headers || {}, {
+      "X-Admin-Password": password
+    });
+    const res = await fetch(path, Object.assign({}, options, { headers }));
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || "Request failed");
+    return data;
+  }
+
+  function render() {
+    const list = $("list");
+    if (!categories.length) {
+      list.innerHTML = '<div class="muted">No categories yet.</div>';
+      return;
+    }
+
+    list.innerHTML = categories.map(c => `
+      <div class="item">
+        <div class="info">
+          <strong><span class="badge">${escapeHtml(c.icon || "📚")}</span>${escapeHtml(c.name)}</strong>
+          <small>${escapeHtml(c.url)}</small>
+          ${c.description ? `<small>${escapeHtml(c.description)}</small>` : ""}
+        </div>
+        <div class="actions">
+          <button class="danger" onclick="removeCategory('${String(c.id).replace(/'/g, "\\'")}')">Delete</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, ch => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[ch]));
+  }
+
+  async function load() {
+    try {
+      const check = await fetch("/api/admin/check", {
+        headers: {"X-Admin-Password": password},
+        cache:"no-store"
+      });
+      if (!check.ok) throw new Error("Unauthorized");
+      const res = await fetch("/api/categories", { cache:"no-store" });
+      if (!res.ok) throw new Error("Could not load categories");
+      categories = await res.json();
+      render();
+      showApp(true);
+    } catch (e) {
+      sessionStorage.removeItem("pcw_admin_password");
+      password = "";
+      showApp(false);
+      $("loginStatus").textContent = "Enter your admin password to continue.";
+    }
+  }
+
+  $("loginForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    password = $("password").value;
+    try {
+      const res = await fetch("/api/admin/check", {
+        headers: {"X-Admin-Password": password},
+        cache:"no-store"
+      });
+      if (!res.ok) throw new Error("Login failed");
+      sessionStorage.setItem("pcw_admin_password", password);
+      $("loginStatus").textContent = "";
+      await load();
+    } catch {
+      $("loginStatus").textContent = "Login failed. Check the password.";
+    }
+  });
+
+  $("addForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    $("status").textContent = "Saving...";
+    try {
+      const data = await api("/api/categories", {
+        method:"PUT",
+        headers:{"content-type":"application/json"},
+        body:JSON.stringify({
+          name:$("name").value,
+          icon:$("icon").value,
+          url:$("url").value,
+          description:$("description").value
+        })
+      });
+      categories = data.categories;
+      render();
+      e.target.reset();
+      $("icon").value = "📚";
+      $("status").textContent = "Category added.";
+    } catch (err) {
+      $("status").textContent = err.message;
+    }
+  });
+
+  window.removeCategory = async function(id) {
+    if (!confirm("Delete this category?")) return;
+    $("status").textContent = "Deleting...";
+    try {
+      const data = await api("/api/categories?id=" + encodeURIComponent(id), {method:"DELETE"});
+      categories = data.categories;
+      render();
+      $("status").textContent = "Category deleted.";
+    } catch (err) {
+      $("status").textContent = err.message;
+    }
+  };
+
+  $("logout").addEventListener("click", () => {
+    sessionStorage.removeItem("pcw_admin_password");
+    password = "";
+    showApp(false);
+    $("password").value = "";
+  });
+
+  // Load the public list first; write operations are what require the secret.
+  // If a saved password exists, show the admin screen.
+  if (password) {
+    load();
+  } else {
+    showApp(false);
+  }
+</script>
+</body>
+</html>
