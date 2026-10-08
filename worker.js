@@ -1,4 +1,13 @@
 const CATEGORIES_KEY = "categories";
+const SETTINGS_KEY = "settings";
+
+const DEFAULT_SETTINGS = {
+  downloadEyebrow: "MOBILE",
+  downloadTitle: "Take it<br>with you.",
+  downloadText: "Put your Android APK here and use the button below to download it.",
+  downloadButton: "Download APK ↓",
+  downloadUrl: "app-release.apk"
+};
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -11,68 +20,58 @@ function json(data, status = 200) {
 }
 
 function authorized(request, env) {
-  const password = request.headers.get("X-Admin-Password");
-  return !!env.ADMIN_PASSWORD && password === env.ADMIN_PASSWORD;
+  return !!env.ADMIN_PASSWORD &&
+    request.headers.get("X-Admin-Password") === env.ADMIN_PASSWORD;
+}
+
+async function getCategories(env) {
+  const raw = await env.CATEGORIES.get(CATEGORIES_KEY);
+  if (!raw) return [];
+  try { return JSON.parse(raw); } catch { return []; }
+}
+
+async function getSettings(env) {
+  const raw = await env.CATEGORIES.get(SETTINGS_KEY);
+  if (!raw) return DEFAULT_SETTINGS;
+  try { return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) }; }
+  catch { return DEFAULT_SETTINGS; }
 }
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Admin password check without changing any data.
     if (request.method === "GET" && url.pathname === "/api/admin/check") {
       if (!authorized(request, env)) return json({ error: "Unauthorized" }, 401);
       return json({ ok: true });
     }
 
-    // Public API: load categories for the main website.
     if (request.method === "GET" && url.pathname === "/api/categories") {
-      const raw = await env.CATEGORIES.get(CATEGORIES_KEY);
-      if (!raw) return json([]);
-      try {
-        return json(JSON.parse(raw));
-      } catch {
-        return json([]);
-      }
+      return json(await getCategories(env));
     }
 
-    // Admin API: replace all categories.
-    if (request.method === "POST" && url.pathname === "/api/categories") {
-      if (!authorized(request, env)) return json({ error: "Unauthorized" }, 401);
-
-      try {
-        const categories = await request.json();
-        if (!Array.isArray(categories)) {
-          return json({ error: "Categories must be an array." }, 400);
-        }
-        await env.CATEGORIES.put(CATEGORIES_KEY, JSON.stringify(categories));
-        return json({ ok: true, categories });
-      } catch {
-        return json({ error: "Invalid JSON." }, 400);
-      }
-    }
-
-    // Admin API: add one category.
     if (request.method === "PUT" && url.pathname === "/api/categories") {
       if (!authorized(request, env)) return json({ error: "Unauthorized" }, 401);
-
       try {
         const item = await request.json();
-        if (!item || typeof item !== "object" || !item.name || !item.url) {
+        if (!item || !item.name || !item.url) {
           return json({ error: "name and url are required." }, 400);
         }
 
-        const raw = await env.CATEGORIES.get(CATEGORIES_KEY);
-        const categories = raw ? JSON.parse(raw) : [];
+        const categories = await getCategories(env);
         const category = {
           id: item.id || crypto.randomUUID(),
           name: String(item.name).trim(),
           url: String(item.url).trim(),
-          icon: String(item.icon || "📚"),
+          icon: String(item.icon || "📚").trim(),
+          logo: String(item.logo || "").trim(),
           description: String(item.description || "").trim()
         };
 
-        categories.push(category);
+        const index = categories.findIndex(c => String(c.id) === String(category.id));
+        if (index >= 0) categories[index] = category;
+        else categories.push(category);
+
         await env.CATEGORIES.put(CATEGORIES_KEY, JSON.stringify(categories));
         return json({ ok: true, category, categories });
       } catch {
@@ -80,22 +79,41 @@ export default {
       }
     }
 
-    // Admin API: delete category by ?id=...
     if (request.method === "DELETE" && url.pathname === "/api/categories") {
       if (!authorized(request, env)) return json({ error: "Unauthorized" }, 401);
-
       const id = url.searchParams.get("id");
       if (!id) return json({ error: "Missing id." }, 400);
 
-      const raw = await env.CATEGORIES.get(CATEGORIES_KEY);
-      const categories = raw ? JSON.parse(raw) : [];
-      const updated = categories.filter(item => String(item.id) !== String(id));
-
+      const categories = await getCategories(env);
+      const updated = categories.filter(c => String(c.id) !== String(id));
       await env.CATEGORIES.put(CATEGORIES_KEY, JSON.stringify(updated));
       return json({ ok: true, categories: updated });
     }
 
-    // Let Cloudflare serve index.html and the other files in the repo.
+    if (request.method === "GET" && url.pathname === "/api/settings") {
+      return json(await getSettings(env));
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/settings") {
+      if (!authorized(request, env)) return json({ error: "Unauthorized" }, 401);
+      try {
+        const incoming = await request.json();
+        const settings = {
+          ...DEFAULT_SETTINGS,
+          ...incoming,
+          downloadEyebrow: String(incoming.downloadEyebrow ?? DEFAULT_SETTINGS.downloadEyebrow),
+          downloadTitle: String(incoming.downloadTitle ?? DEFAULT_SETTINGS.downloadTitle),
+          downloadText: String(incoming.downloadText ?? DEFAULT_SETTINGS.downloadText),
+          downloadButton: String(incoming.downloadButton ?? DEFAULT_SETTINGS.downloadButton),
+          downloadUrl: String(incoming.downloadUrl ?? DEFAULT_SETTINGS.downloadUrl)
+        };
+        await env.CATEGORIES.put(SETTINGS_KEY, JSON.stringify(settings));
+        return json({ ok: true, settings });
+      } catch {
+        return json({ error: "Invalid settings." }, 400);
+      }
+    }
+
     return env.ASSETS.fetch(request);
   }
 };
