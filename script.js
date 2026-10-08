@@ -1,53 +1,125 @@
-const categories = ["AASH Officer", "All Competition", "Allen", "Apna College", "PW BOOK", "Career Will", "CDS Journey", "Disha Online", "Education Baba", "Eduteria", "English Speaking", "Futurekul", "GS Version", "Gyan Bindu GS Academy", "IIT School", "Just Padhle", "KD Live", "Khan Global Studies", "Master Sahab", "MD Classes", "MissionJEET", "Motion", "Munil Sir", "Next Toppers", "Padhle Akshay", "Parmar SSC", "Physics Wallah", "PW OTT - Pi Pro", "RG Vikram Jeet", "Rojgar With Ankit", "Sachin Academy", "Sarvam Kota", "Science And Fun", "Selection Way", "Study IQ", "Taiyari Karlo", "Target Board", "Test Book", "Test Ranker", "Topper's Wisdom", "UnAcademy", "Utkarsh Classes", "Vibrant Academy", "Vidhyagram", "Vidhyakul", "Yes Officer"];
-const logoDomains = {"Allen": "allen.in", "Apna College": "apnacollege.in", "Career Will": "careerwill.com", "Disha Online": "dishaonlineclasses.com", "Khan Global Studies": "kgs.live", "Physics Wallah": "pw.live", "PW OTT - Pi Pro": "pw.live", "UnAcademy": "unacademy.com", "Test Book": "testbook.com", "Study IQ": "studyiq.com", "Utkarsh Classes": "utkarsh.com", "Vidhyakul": "vidhyakul.com", "Vidhyagram": "vidhyagram.com"};
-const quotes = [
-"Mehnat itni khamoshi se karo ki safalta shor macha de.",
-"Aaj ka 2 ghanta, kal ki tension ko kam karta hai.",
-"Slow progress is still progress.",
-"Discipline > Motivation. Roz thoda karo.",
-"Tumhara future, aaj ke decision se banta hai.",
-"Don't stop when you're tired. Stop when you're done."
+// ================= PCW STUDY =================
+// Add your own authorized course/batch URLs below.
+// Example:
+// { category: "Physics Wallah", name: "My Batch", type: "JEE", url: "https://example.com" }
+
+const categories = [
+"AASH Officer","All Competition","Allen","Apna College","PW BOOK","Career Will","CDS Journey",
+"Disha Online","Education Baba","Eduteria","English Speaking","Futurekul","GS Version",
+"Gyan Bindu GS Academy","IIT School","Just Padhle","KD Live","Khan Global Studies","Master Sahab",
+"MD Classes","MissionJEET","Motion","Munil Sir","Next Toppers","Padhle Akshay","Parmar SSC",
+"Physics Wallah","PW OTT - Pi Pro","RG Vikram Jeet","Rojgar With Ankit","Sachin Academy",
+"Sarvam Kota","Science And Fun","Selection Way","Study IQ","Taiyari Karlo","Target Board",
+"Test Book","Test Ranker","Topper's Wisdom","UnAcademy","Utkarsh Classes","Vibrant Academy",
+"Vidhyagram","Vidhyakul","Yes Officer"
 ];
 
-// APNE COURSE/BATCH YAHAN ADD KARO
-// Example:
-// {category:"Physics Wallah",name:"Arjuna JEE 2026",type:"JEE",tag:"Popular",url:"https://example.com"}
-const resources = [];
+// ================= APNE COURSES YAHAN ADD KARO =================
+const resources = [
+  // { category: "Physics Wallah", name: "Arjuna JEE 2026", type: "JEE", tag: "Popular", url: "https://example.com" },
+  // { category: "Disha Online", name: "Class 12 Physics", type: "Board", tag: "New", url: "https://example.com" },
+];
+// =============================================================
 
-function fallbackLogo(n){return n.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join("").toUpperCase()}
-function logoHTML(c){
- const d=logoDomains[c];
- if(d) return `<div class="logo"><img loading="lazy" src="https://www.google.com/s2/favicons?domain=${d}&sz=128" alt="${c} logo" onerror="this.style.display='none';this.parentElement.textContent='${fallbackLogo(c)}'"></div>`;
- return `<div class="logo">${fallbackLogo(c)}</div>`;
+const logoDomains = {
+  "Allen":"allen.in","Apna College":"apnacollege.in","Career Will":"careerwill.com",
+  "Disha Online":"dishaonlineclasses.com","Khan Global Studies":"kgs.live",
+  "Physics Wallah":"pw.live","PW OTT - Pi Pro":"pw.live","UnAcademy":"unacademy.com",
+  "Test Book":"testbook.com","Study IQ":"studyiq.com","Utkarsh Classes":"utkarsh.com",
+  "Vidhyakul":"vidhyakul.com","Vidhyagram":"vidhyagram.com"
+};
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+function logoFor(name){
+  const domain = logoDomains[name];
+  if(domain) return `<img src="https://www.google.com/s2/favicons?domain=${domain}&sz=128" alt="">`;
+  return name.split(/\s+/).slice(0,2).map(x=>x[0]).join("").toUpperCase();
 }
-function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-function platformCard(c){
- const count=resources.filter(r=>r.category===c).length;
- return `<article class="platform-card" onclick="showCategory('${esc(c)}')">${logoHTML(c)}<h3>${esc(c)}</h3><div class="meta">Courses · Batches · Resources</div><div class="count">${count} resources · Open →</div></article>`;
+
+function platformCard(category){
+  const count = resources.filter(r => r.category === category).length;
+  return `<article class="platform-card" data-category="${escapeHtml(category)}">
+    <div class="logo">${logoFor(category)}</div>
+    <h3>${escapeHtml(category)}</h3>
+    <small>Courses · Batches · Resources</small>
+    <span class="count">${count} resources · Open →</span>
+  </article>`;
+}
+function renderPlatforms(){
+  $("#platformGrid").innerHTML = categories.slice(0,8).map(platformCard).join("");
+  $("#allPlatformGrid").innerHTML = categories.map(platformCard).join("");
 }
 function resourceCard(r){
- return `<article class="resource-card">${logoHTML(r.category)}<h3>${esc(r.name)}</h3><p>${esc(r.category)}${r.type?" · "+esc(r.type):""}${r.tag?" · "+esc(r.tag):""}</p><button onclick="window.open(decodeURIComponent('${encodeURIComponent(r.url||"#")}'),'_blank')">Open →</button></article>`;
+  const saved = getSaved().includes(r.name);
+  return `<article class="resource-card">
+    <button class="save" data-save="${encodeURIComponent(r.name)}">${saved ? "♥":"♡"}</button>
+    <div class="eyebrow">${escapeHtml(r.category)}</div>
+    <h3>${escapeHtml(r.name)}</h3>
+    <p>${escapeHtml(r.type || "Course")} ${r.tag ? "· "+escapeHtml(r.tag):""}</p>
+    <a class="open" href="${safeUrl(r.url)}" target="_blank" rel="noopener">OPEN ↗</a>
+  </article>`;
 }
-function renderHome(){
- document.getElementById("platformGrid").innerHTML=categories.slice(0,8).map(platformCard).join("");
- document.getElementById("resourceGrid").innerHTML=resources.length?resources.slice(0,8).map(resourceCard).join(""):`<div class="resource-card" style="grid-column:1/-1"><h3>⭐ Your batches will appear here</h3><p>Add a course in script.js and commit the change.</p></div>`;
- document.getElementById("dailyQuote").textContent=quotes[new Date().getDate()%quotes.length];
+function renderResources(){
+  const all = resources;
+  $("#jeeGrid").innerHTML = all.filter(r => /jee/i.test((r.type||"")+" "+(r.name||""))).map(resourceCard).join("") || empty("No JEE courses added yet.");
+  $("#neetGrid").innerHTML = all.filter(r => /neet/i.test((r.type||"")+" "+(r.name||""))).map(resourceCard).join("") || empty("No NEET courses added yet.");
+  $("#boardGrid").innerHTML = all.filter(r => /board|class/i.test((r.type||"")+" "+(r.name||""))).map(resourceCard).join("") || empty("No board courses added yet.");
+  const savedNames = getSaved();
+  $("#savedGrid").innerHTML = all.filter(r => savedNames.includes(r.name)).map(resourceCard).join("") || empty("Save a course with ♡ and it will appear here.");
 }
-function showHome(){renderHome();scrollTo(0,0)}
-function showCategories(){document.getElementById("platformGrid").innerHTML=categories.map(platformCard).join("");document.getElementById("resourceGrid").innerHTML=resources.map(resourceCard).join("");scrollTo(0,0)}
-function showCategory(c){const rs=resources.filter(r=>r.category===c);document.getElementById("platformGrid").innerHTML=platformCard(c);document.getElementById("resourceGrid").innerHTML=rs.length?rs.map(resourceCard).join(""):`<div class="resource-card" style="grid-column:1/-1"><h3>${esc(c)}</h3><p>No batches added yet.</p></div>`;scrollTo(0,0)}
-function renderSearch(q){q=q.trim().toLowerCase();if(!q)return showHome();const cs=categories.filter(c=>c.toLowerCase().includes(q));const rs=resources.filter(r=>(r.name+" "+r.category+" "+(r.type||"")).toLowerCase().includes(q));document.getElementById("platformGrid").innerHTML=cs.map(platformCard).join("")||`<div class="resource-card"><h3>No platform found</h3></div>`;document.getElementById("resourceGrid").innerHTML=rs.map(resourceCard).join("")||`<div class="resource-card"><h3>No course found</h3></div>`}
-function filterType(t){const rs=resources.filter(r=>(r.type||"").toLowerCase()===t.toLowerCase());document.getElementById("platformGrid").innerHTML=categories.map(platformCard).join("");document.getElementById("resourceGrid").innerHTML=rs.length?rs.map(resourceCard).join(""):`<div class="resource-card"><h3>${t} resources</h3><p>Add resources with type "${t}" in script.js.</p></div>`}
-function showMotivation(){document.getElementById("platformGrid").innerHTML=quotes.map((q,i)=>`<article class="platform-card"><h3>✦ Motivation #${i+1}</h3><p style="color:#d9e2f7;line-height:1.6">${q}</p></article>`).join("");document.getElementById("resourceGrid").innerHTML=""}
-function showResources(){document.getElementById("platformGrid").innerHTML=`<article class="feature-card resource-bg" style="min-height:140px"><b>📚 Study Resources</b><span>Notes · PDFs · Question Papers · Roadmaps</span></article>`;document.getElementById("resourceGrid").innerHTML=resources.map(resourceCard).join("")||`<div class="resource-card"><h3>📁 Resources ready</h3><p>Add authorized resource URLs in script.js.</p></div>`}
-function showNotes(){showResources()}
-function showLinks(){document.getElementById("platformGrid").innerHTML=`<article class="platform-card" style="grid-column:1/-1"><h3>🔗 Important Links</h3><p class="meta">Add official links inside Quick Links in index.html.</p></article>`;document.getElementById("resourceGrid").innerHTML=""}
-function showSaved(){document.getElementById("platformGrid").innerHTML=`<article class="platform-card"><h3>♡ Saved</h3><p class="meta">Saved-course support is ready.</p></article>`;document.getElementById("resourceGrid").innerHTML=""}
-function showAbout(){document.getElementById("platformGrid").innerHTML=`<article class="platform-card" style="grid-column:1/-1"><h3>PCW Study</h3><p style="color:#bdc9e3;line-height:1.7">Priyanshu Course World — study platforms, courses, resources and motivation in one place.</p></article>`;document.getElementById("resourceGrid").innerHTML=""}
-function toggleTheme(){document.body.classList.toggle("light-mode")}
-let timerSeconds=7200,timerInterval=null;
-function updateTimer(){let h=String(Math.floor(timerSeconds/3600)).padStart(2,"0"),m=String(Math.floor(timerSeconds%3600/60)).padStart(2,"0"),s=String(timerSeconds%60).padStart(2,"0");document.getElementById("timer").textContent=`${h}:${m}:${s}`}
-function startTimer(){if(timerInterval)return;timerInterval=setInterval(()=>{if(timerSeconds>0){timerSeconds--;updateTimer()}else pauseTimer()},1000)}
-function pauseTimer(){clearInterval(timerInterval);timerInterval=null}
-function resetTimer(){pauseTimer();timerSeconds=7200;updateTimer()}
-renderHome();updateTimer();
+function empty(t){ return `<div class="resource-card"><p>${t}</p></div>`; }
+
+function getSaved(){ try{return JSON.parse(localStorage.getItem("pcw_saved")||"[]")}catch{return[]}}
+function toggleSave(name){
+  let a=getSaved(); a=a.includes(name)?a.filter(x=>x!==name):[...a,name];
+  localStorage.setItem("pcw_saved",JSON.stringify(a)); renderResources();
+}
+function escapeHtml(v=""){return String(v).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function safeUrl(v=""){try{const u=new URL(v);return /^https?:$/.test(u.protocol)?u.href:"#"}catch{return"#"}}
+
+function showSection(id){
+  $$(".section").forEach(x=>x.classList.toggle("active",x.id===id));
+  $$(".side-btn,.bottom-nav button,.top-nav button").forEach(x=>x.classList.toggle("active",x.dataset.section===id));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.addEventListener("click",e=>{
+  const sec=e.target.closest("[data-section]");
+  if(sec){ showSection(sec.dataset.section); return; }
+  const card=e.target.closest(".platform-card");
+  if(card){
+    const name=card.dataset.category;
+    const q=encodeURIComponent(name.toLowerCase());
+    $("#search").value=name;
+    filterAll(name);
+    showSection("platforms");
+  }
+  const save=e.target.closest("[data-save]");
+  if(save){toggleSave(decodeURIComponent(save.dataset.save));}
+});
+function filterAll(term){
+  const t=term.toLowerCase();
+  $$(".platform-card").forEach(c=>c.style.display=c.innerText.toLowerCase().includes(t)?"block":"none");
+}
+$("#search").addEventListener("input",e=>{
+  const t=e.target.value.toLowerCase().trim();
+  $$(".platform-card").forEach(c=>c.style.display=!t||c.innerText.toLowerCase().includes(t)?"block":"none");
+});
+$("#themeBtn").addEventListener("click",()=>{
+  document.body.classList.toggle("gold-mode");
+});
+
+const motivations=[
+"Slow progress is still progress.","Your future self will thank you.",
+"Consistency beats motivation.","One chapter at a time.",
+"Study now. Celebrate later.","Don't stop when it gets hard."
+];
+$("#motivationText").textContent=motivations[new Date().getDate()%motivations.length];
+
+for(let i=0;i<38;i++){
+  const p=document.createElement("i"); p.className="particle";
+  p.style.left=Math.random()*100+"%"; p.style.animationDelay=(-Math.random()*7)+"s";
+  p.style.animationDuration=(4+Math.random()*8)+"s"; $("#particles").appendChild(p);
+}
+renderPlatforms(); renderResources();

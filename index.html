@@ -1,63 +1,159 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#050817"><title>PCW Study — Priyanshu Course World</title>
-<link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PCW Study — Priyanshu Course World</title>
+  <meta name="description" content="PCW Study — courses, batches and study resources in one place.">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header class="topbar">
-  <a class="brand" href="#" onclick="showHome();return false;">
-    <div class="brand-mark">PCW</div>
-    <div><div class="brand-title">PCW Study</div><div class="brand-sub">Priyanshu Course World</div><div class="owner">Owner - Priyanshu Raj</div></div>
-  </a>
-  <div class="top-search">⌕ <input id="searchInput" type="search" placeholder="Search courses, batches, platforms..." oninput="renderSearch(this.value)"></div>
-  <nav class="top-nav"><button onclick="showHome()">⌂ Home</button><button onclick="showSaved()">♡ Saved</button><button onclick="toggleTheme()">☾</button></nav>
-</header>
-<div class="layout">
-<aside class="sidebar">
-  <button class="side active" onclick="showHome()">🏠 <span>Home</span></button>
-  <button class="side" onclick="showCategories()">▦ <span>All Platforms</span></button>
-  <button class="side" onclick="filterType('JEE')">🚀 <span>JEE</span></button>
-  <button class="side" onclick="filterType('NEET')">🩺 <span>NEET</span></button>
-  <button class="side" onclick="filterType('Board')">📚 <span>Boards (Class 9-12)</span></button>
-  <button class="side" onclick="showMotivation()">⚡ <span>Motivation</span></button>
-  <button class="side" onclick="showResources()">📁 <span>Study Resources</span></button>
-  <button class="side" onclick="showNotes()">📄 <span>Notes & PDFs</span></button>
-  <button class="side" onclick="showLinks()">🔗 <span>Important Links</span></button>
-  <button class="side" onclick="showAbout()">ⓘ <span>About</span></button>
-  <div class="side-art">Dream.<br>Plan.<br>Study.<br><b>Achieve. ✦</b></div>
-</aside>
-<main>
-<section class="hero">
-  <div class="hero-art"></div><div class="hero-content">
-    <div class="eyebrow">✦ PCW STUDY</div><h1>Your Dreams<br><em>Are Valid.</em></h1>
-    <p>Study today → Freedom tomorrow.</p>
-    <div class="hero-actions"><button onclick="showCategories()">🎓 Top Platforms</button><button onclick="showResources()">⭐ Free Resources</button><button onclick="showMotivation()">💜 Motivation</button></div>
-  </div>
-  <div class="hero-quote">“Discipline is the<br>real freedom.”<small>— PCW Study</small></div>
-</section>
-<section class="content-grid">
-<div class="main-column">
-<section class="section-head"><div><h2>🚀 Explore Platforms</h2><p>Courses, batches & resources in one place.</p></div><button class="outline" onclick="showCategories()">View All →</button></section>
-<div id="platformGrid" class="platform-grid"></div>
-<section class="section-head second"><div><h2>🔥 Popular Batches</h2><p>Your added courses appear here automatically.</p></div></section>
-<div id="resourceGrid" class="resource-grid"></div>
-<div class="feature-row">
-<button onclick="showResources()" class="feature-card resource-bg"><b>📚 Study Resources</b><span>Notes · PDFs · Question Papers</span><i>Explore →</i></button>
-<button onclick="showMotivation()" class="feature-card motivation-bg"><b>🕊 Motivation Zone</b><span>Quotes · Success · Mindset</span><i>Get inspired →</i></button>
-<button onclick="showLinks()" class="feature-card links-bg"><b>🔗 Important Links</b><span>Official websites · Useful links</span><i>View links →</i></button>
-</div>
-</div>
-<aside class="right-column">
-<div class="quote-card mini-art"><div>“Small steps.<br>Big dreams.”</div></div>
-<div class="panel"><h3>💡 Daily Motivation</h3><p id="dailyQuote"></p><small>— PCW Study</small></div>
-<div class="panel timer-panel"><h3>⏱ Study Timer</h3><div class="timer-mode">Focus mode ON</div><div id="timer">02:00:00</div><div class="timer-buttons"><button onclick="startTimer()">Start</button><button onclick="pauseTimer()">Pause</button><button onclick="resetTimer()">Reset</button></div></div>
-<div class="panel"><h3>⚡ Quick Links</h3><div class="quick-links"><a href="#" target="_blank">▶<span>YouTube</span></a><a href="#" target="_blank">➤<span>Telegram</span></a><a href="#" target="_blank">☘<span>WhatsApp</span></a><a href="#" target="_blank">🌐<span>Website</span></a></div></div>
-<div class="quote-card bottom-art">Keep going.<br>Your future self<br>will thank you.</div>
-</aside>
-</section>
-</main></div>
-<nav class="mobile-nav"><button onclick="showHome()">⌂<span>Home</span></button><button onclick="showCategories()">▦<span>Courses</span></button><button onclick="showMotivation()">⚡<span>Motivation</span></button><button onclick="showResources()">📁<span>Resources</span></button><button onclick="showSaved()">♡<span>Saved</span></button></nav>
-<script src="script.js"></script>
-</body></html>
+  <div class="scanlines"></div>
+  <div class="particles" id="particles"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="reactor mini-reactor"><span></span></div>
+      <div>
+        <div class="brand-name">PCW Study</div>
+        <div class="brand-sub">Priyanshu Course World</div>
+        <div class="owner">Owner — Priyanshu Raj</div>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <span>⌕</span>
+      <input id="search" type="search" placeholder="Search courses, batches, platforms...">
+    </div>
+
+    <nav class="top-nav">
+      <button data-section="home">⌂ Home</button>
+      <button data-section="saved">♡ Saved</button>
+      <button id="themeBtn" title="Theme">◐</button>
+    </nav>
+  </header>
+
+  <aside class="sidebar">
+    <button class="side-btn active" data-section="home">🏠 <span>Home</span></button>
+    <button class="side-btn" data-section="platforms">▦ <span>All Platforms</span></button>
+    <button class="side-btn" data-section="jee">🚀 <span>JEE</span></button>
+    <button class="side-btn" data-section="neet">🩺 <span>NEET</span></button>
+    <button class="side-btn" data-section="boards">📚 <span>Boards (Class 9–12)</span></button>
+    <button class="side-btn" data-section="about">ⓘ <span>About</span></button>
+    <button class="side-btn" data-section="links">🔗 <span>Important Links</span></button>
+  </aside>
+
+  <main class="main">
+    <section id="home" class="section active">
+      <div class="hero hud-border">
+        <div class="hero-copy">
+          <div class="eyebrow">◈ PCW STUDY SYSTEM ONLINE</div>
+          <h1>Study Smart.<br><em>Build Your Future.</em></h1>
+          <p>Courses, batches & useful resources — organized in one place.</p>
+          <div class="hero-actions">
+            <button class="gold-btn" data-section="platforms">EXPLORE COURSES →</button>
+            <button class="outline-btn" data-section="links">IMPORTANT LINKS</button>
+          </div>
+        </div>
+
+        <div class="arc-display">
+          <div class="ring r1"></div>
+          <div class="ring r2"></div>
+          <div class="ring r3"></div>
+          <div class="reactor"><span></span></div>
+          <div class="hud-label">PCW<br><small>CORE</small></div>
+        </div>
+
+        <div class="quote">
+          <b>“Discipline creates freedom.”</b>
+          <span>— PCW Study</span>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">◈ DIRECTORY</div>
+          <h2>Explore Platforms</h2>
+          <p>Courses, batches & resources in one place.</p>
+        </div>
+        <button class="outline-btn" data-section="platforms">View All →</button>
+      </div>
+
+      <div id="platformGrid" class="platform-grid"></div>
+    </section>
+
+    <section id="platforms" class="section">
+      <div class="page-title">
+        <div class="eyebrow">◈ COURSE DATABASE</div>
+        <h2>All Platforms</h2>
+        <p>Select a platform to see its courses and batches.</p>
+      </div>
+      <div id="allPlatformGrid" class="platform-grid"></div>
+    </section>
+
+    <section id="jee" class="section">
+      <div class="page-title"><div class="eyebrow">◈ TARGET MODE</div><h2>JEE</h2><p>JEE-related courses and batches.</p></div>
+      <div id="jeeGrid" class="resource-grid"></div>
+    </section>
+
+    <section id="neet" class="section">
+      <div class="page-title"><div class="eyebrow">◈ TARGET MODE</div><h2>NEET</h2><p>NEET-related courses and batches.</p></div>
+      <div id="neetGrid" class="resource-grid"></div>
+    </section>
+
+    <section id="boards" class="section">
+      <div class="page-title"><div class="eyebrow">◈ BOARD MODE</div><h2>Boards (Class 9–12)</h2><p>Board resources and batches.</p></div>
+      <div id="boardGrid" class="resource-grid"></div>
+    </section>
+
+    <section id="saved" class="section">
+      <div class="page-title"><div class="eyebrow">◈ YOUR VAULT</div><h2>Saved</h2><p>Your saved courses appear here.</p></div>
+      <div id="savedGrid" class="resource-grid"></div>
+    </section>
+
+    <section id="links" class="section">
+      <div class="page-title"><div class="eyebrow">◈ QUICK ACCESS</div><h2>Important Links</h2><p>Useful official study links.</p></div>
+      <div class="link-grid">
+        <a class="link-card" href="https://www.nta.ac.in/" target="_blank" rel="noopener"><span>🏛️</span><b>NTA</b><small>National Testing Agency</small></a>
+        <a class="link-card" href="https://neet.nta.nic.in/" target="_blank" rel="noopener"><span>🩺</span><b>NEET Official</b><small>Official NEET portal</small></a>
+        <a class="link-card" href="https://jeemain.nta.nic.in/" target="_blank" rel="noopener"><span>🚀</span><b>JEE Main Official</b><small>Official JEE Main portal</small></a>
+        <a class="link-card" href="https://biharboardonline.bihar.gov.in/" target="_blank" rel="noopener"><span>📚</span><b>BSEB</b><small>Bihar Board official portal</small></a>
+      </div>
+    </section>
+
+    <section id="about" class="section">
+      <div class="about-card hud-border">
+        <div class="eyebrow">◈ ABOUT PCW</div>
+        <h2>PCW Study</h2>
+        <p><strong>Priyanshu Course World</strong> is a simple study-resource directory for finding courses, batches and useful links without searching everywhere.</p>
+        <div class="about-line"><span>Owner</span><b>Priyanshu Raj</b></div>
+        <div class="about-line"><span>Purpose</span><b>Study resources in one place</b></div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="right-panel">
+    <div class="side-quote hud-border">
+      <span>“Small steps.<br>Big dreams.”</span>
+    </div>
+    <div class="motivation hud-border">
+      <div class="eyebrow">◈ DAILY MOTIVATION</div>
+      <h3 id="motivationText">Slow progress is still progress.</h3>
+      <span>— PCW Study</span>
+    </div>
+    <div class="status-card hud-border">
+      <div class="status-dot"></div>
+      <div><b>SYSTEM READY</b><small>Course directory online</small></div>
+    </div>
+  </aside>
+
+  <nav class="bottom-nav">
+    <button data-section="home">⌂<span>Home</span></button>
+    <button data-section="platforms">▦<span>Courses</span></button>
+    <button data-section="links">🔗<span>Links</span></button>
+    <button data-section="about">ⓘ<span>About</span></button>
+  </nav>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,19 +1,18 @@
-PCW STUDY — ANIME RESPONSIVE VERSION
+PCW STUDY — IRON / ARMORED HUD THEME
 
-Desktop + tablet + phone responsive layout.
-Includes anime/night-sky theme, motivation, study timer, search, platforms, batches, resources, notes and important links.
+Files:
+- index.html
+- styles.css
+- script.js
 
-ADD COURSE:
-Open script.js and find:
-const resources = [];
+HOW TO ADD A COURSE/BATCH:
+1. Open script.js.
+2. Find: const resources = [
+3. Add:
+   { category: "Physics Wallah", name: "Batch Name", type: "JEE", tag: "New", url: "https://YOUR-AUTHORIZED-URL.com" },
+4. Save/Commit the file.
+5. If connected to Cloudflare Pages, the live website automatically redeploys.
 
-Example:
-{category:"Physics Wallah",name:"Arjuna JEE 2026",type:"JEE",tag:"Popular",url:"https://example.com"}
-
-Use only legitimate/authorized URLs.
-
-LOGOS:
-Mapped platforms load a favicon/logo from their official domain. Other categories show initials. Add more domains inside logoDomains in script.js.
-
-DEPLOY:
-Replace the files in your existing GitHub repository with this version. Cloudflare Pages will redeploy after the commit.
+IMPORTANT:
+- Use only URLs you are authorized to share.
+- The site is designed as an Iron-Man-inspired red/gold futuristic armored HUD aesthetic, without copying movie artwork/assets.
