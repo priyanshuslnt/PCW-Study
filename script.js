@@ -94,26 +94,6 @@
     render();
   }
 
-  async function loadSettings() {
-    try {
-      const response = await fetch("/api/settings", { cache: "no-store" });
-      if (!response.ok) throw new Error("Settings unavailable");
-      const settings = await response.json();
-      if ($("downloadEyebrow")) $("downloadEyebrow").textContent = settings.downloadEyebrow || "MOBILE";
-      if ($("downloadTitle")) $("downloadTitle").textContent = settings.downloadTitle || "Take it with you.";
-      if ($("downloadText")) $("downloadText").textContent = settings.downloadText || "Put your Android APK link here and use the button below.";
-      const button = $("downloadButton");
-      if (button) {
-        button.textContent = settings.downloadButton || "Download APK ↓";
-        const url = safeUrl(settings.downloadUrl);
-        button.href = url;
-        button.hidden = url === "#";
-      }
-    } catch {
-      // Defaults in HTML remain visible if the API/KV is empty or unavailable.
-    }
-  }
-
   function initNav() {
     const menu = $("menuBtn");
     const nav = $("navLinks");
@@ -136,5 +116,4 @@
   initNav();
   render();
   loadCategories();
-  loadSettings();
 })();
