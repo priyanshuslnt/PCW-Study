@@ -1,144 +1,29 @@
 (() => {
   "use strict";
-
-  let categories = [];
-  let saved = [];
-  try {
-    const raw = localStorage.getItem("pr_saved");
-    const parsed = raw ? JSON.parse(raw) : [];
-    saved = Array.isArray(parsed) ? parsed.map(String) : [];
-  } catch { saved = []; }
-
-  const $ = (id) => document.getElementById(id);
-  const grid = $("categoryGrid");
-  const savedList = $("savedList");
-  const count = $("categoryCount");
-
-  function escapeHtml(value) {
-    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
-    }[char]));
+  const $ = id => document.getElementById(id);
+  let categories = [], updates = [], selected = null;
+  let saved = []; try { const v = JSON.parse(localStorage.getItem('pr_saved') || '[]'); saved = Array.isArray(v) ? v.map(String) : []; } catch {}
+  const grid=$('categoryGrid'), savedList=$('savedList'), count=$('categoryCount');
+  const esc = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  function safeUrl(v){try{const u=new URL(String(v||''),location.href);return ['http:','https:'].includes(u.protocol)?u.href:'#'}catch{return '#'}}
+  function image(v){const u=safeUrl(v);return u==='#'?'':u}
+  function saveSaved(){try{localStorage.setItem('pr_saved',JSON.stringify(saved))}catch{}}
+  function render(){
+    if(!grid)return;
+    if(count)count.textContent=`${categories.length} ${categories.length===1?'category':'categories'}`;
+    if(!categories.length){grid.innerHTML='<div class="state-card"><div class="empty-icon">✦</div><p>Categories could not be loaded.</p><small>Refresh in a moment. Your saved server data has not been changed.</small></div>';}
+    else grid.innerHTML=categories.map((c,i)=>{const id=String(c.id??i),logo=image(c.logo),on=saved.includes(id);return `<article class="card category-card" data-open="${esc(id)}" tabindex="0" role="button" aria-label="Open ${esc(c.name||'category')}"><button class="save ${on?'active':''}" data-save="${esc(id)}" type="button" aria-label="${on?'Unsave':'Save'}">${on?'♥':'♡'}</button>${logo?`<div class="card-logo"><img src="${esc(logo)}" alt="" loading="lazy" onerror="this.parentElement.textContent='${esc(c.icon||'📚')}'"></div>`:`<div class="card-logo fallback">${esc(c.icon||'📚')}</div>`}<div class="card-body"><h3>${esc(c.name||'Untitled')}</h3><p>${esc(c.description||'Course resources')}</p></div><span class="open-link">OPEN COURSE ↗</span></article>`}).join('');
+    renderSaved();
   }
-
-  function safeUrl(value) {
-    try {
-      const url = new URL(String(value || ""), window.location.href);
-      return ["http:", "https:"].includes(url.protocol) ? url.href : "#";
-    } catch { return "#"; }
-  }
-
-  function safeImageUrl(value) {
-    try {
-      const url = new URL(String(value || ""), window.location.href);
-      return ["http:", "https:"].includes(url.protocol) ? url.href : "";
-    } catch { return ""; }
-  }
-
-  function persistSaved() {
-    try { localStorage.setItem("pr_saved", JSON.stringify(saved)); } catch {}
-  }
-
-  function logoMarkup(category) {
-    const logo = safeImageUrl(category.logo);
-    const icon = escapeHtml(category.icon || "📚");
-    if (!logo) return `<div class="card-logo fallback" aria-hidden="true">${icon}</div>`;
-    return `<div class="card-logo"><img src="${escapeHtml(logo)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="logo-fallback" hidden>${icon}</span></div>`;
-  }
-
-  function render() {
-    if (!grid || !savedList) return;
-    categories = Array.isArray(categories) ? categories : [];
-    const validIds = new Set(categories.map(c => String(c.id)));
-    saved = saved.filter(id => validIds.has(String(id)));
-    persistSaved();
-
-    if (count) count.textContent = `${categories.length} ${categories.length === 1 ? "resource" : "resources"}`;
-
-    if (!categories.length) {
-      grid.innerHTML = `<div class="state-card"><div class="empty-icon">✦</div><p>No categories yet.</p><small>The site is ready — add resources from Admin.</small></div>`;
-    } else {
-      grid.innerHTML = categories.map((c) => {
-        const id = String(c.id || "");
-        const isSaved = saved.includes(id);
-        return `<article class="card">
-          <button class="save ${isSaved ? "active" : ""}" data-save="${escapeHtml(id)}" type="button" aria-label="${isSaved ? "Remove from saved" : "Save category"}">${isSaved ? "★" : "☆"}</button>
-          ${logoMarkup(c)}
-          <div class="card-body"><h3>${escapeHtml(c.name || "Untitled")}</h3><p>${escapeHtml(c.description || "Study resource")}</p></div>
-          <a class="open-link" href="${escapeHtml(safeUrl(c.url))}" target="_blank" rel="noopener noreferrer">OPEN →</a>
-        </article>`;
-      }).join("");
-    }
-
-    const savedItems = categories.filter(c => saved.includes(String(c.id)));
-    savedList.innerHTML = savedItems.length
-      ? savedItems.map(c => `<a class="saved-chip" href="${escapeHtml(safeUrl(c.url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(c.icon || "📚")} ${escapeHtml(c.name || "Untitled")}</a>`).join("")
-      : `<p class="empty">No saved categories yet. Tap ☆ on a course to save it.</p>`;
-  }
-
-  function toggleSave(id) {
-    const key = String(id);
-    saved = saved.includes(key) ? saved.filter(item => item !== key) : [...saved, key];
-    persistSaved();
-    render();
-  }
-
-  async function loadCategories() {
-    try {
-      const response = await fetch("/api/categories", { cache: "no-store" });
-      if (!response.ok) throw new Error("Category API unavailable");
-      const data = await response.json();
-      categories = Array.isArray(data) ? data : [];
-    } catch {
-      categories = [];
-    }
-    render();
-  }
-
-
-  function initNav() {
-    const menu = $("menuBtn");
-    const nav = $("navLinks");
-    if (!menu || !nav) return;
-    menu.addEventListener("click", () => {
-      const open = nav.classList.toggle("open");
-      menu.setAttribute("aria-expanded", String(open));
-    });
-    nav.querySelectorAll("a").forEach(link => link.addEventListener("click", () => {
-      nav.classList.remove("open");
-      menu.setAttribute("aria-expanded", "false");
-    }));
-  }
-
-  if (grid) grid.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-save]");
-    if (button) toggleSave(button.dataset.save);
-  });
-
-  function initLearnerName() {
-    const input = $("learnerName");
-    const save = $("saveName");
-    const note = $("greetingNote");
-    if (!input || !save || !note) return;
-    let name = "";
-    try { name = localStorage.getItem("venom_study_learner_name") || ""; } catch {}
-    input.value = name;
-    const update = () => {
-      const clean = input.value.trim().slice(0, 40);
-      try {
-        if (clean) localStorage.setItem("venom_study_learner_name", clean);
-        else localStorage.removeItem("venom_study_learner_name");
-      } catch {}
-      note.textContent = clean ? `Keep going, ${clean} — your future self will thank you!` : "Your study journey starts here.";
-      const greeting = document.querySelector(".greeting");
-      if (greeting) greeting.textContent = clean ? `GOOD MORNING, ${clean.toUpperCase()}` : "GOOD MORNING,";
-    };
-    save.addEventListener("click", update);
-    input.addEventListener("keydown", event => { if (event.key === "Enter") update(); });
-    if (name) update();
-  }
-
-  initLearnerName();\n  initNav();
-  render();
-  loadCategories();
-
+  function renderSaved(){const items=categories.filter((c,i)=>saved.includes(String(c.id??i)));savedList.innerHTML=items.length?items.map((c,i)=>`<button class="saved-chip" data-open="${esc(c.id??i)}" type="button">${esc(c.icon||'📚')} ${esc(c.name||'Course')} ↗</button>`).join(''):'<p class="empty">No saved courses yet. Open a category and tap Save.</p>'}
+  function openDetail(id){selected=categories.find((c,i)=>String(c.id??i)===String(id));if(!selected)return;const layer=$('detailLayer'),logo=image(selected.logo),url=safeUrl(selected.url),isSaved=saved.includes(String(selected.id));$('detailSave').textContent=isSaved?'♥ Saved':'♡ Save';$('detailContent').innerHTML=`${logo?`<div class="detail-art" style="background-image:linear-gradient(0deg,#05060cf2,transparent 80%),url('${esc(logo)}')"></div>`:`<div class="detail-art detail-art-fallback">${esc(selected.icon||'📚')}</div>`}<p class="eyebrow">VENOM STUDY • COURSE</p><h1>${esc(selected.name||'Course')}</h1><p class="detail-description">${esc(selected.description||'Open the course resource to start learning.')}</p><div class="detail-meta"><span>COURSE RESOURCE</span><span>YOUR LEARNING JOURNEY</span></div><a class="btn primary play-btn" href="${esc(url)}" target="_blank" rel="noopener noreferrer">▶ PLAY / OPEN COURSE</a><p class="detail-hint">The course opens using the URL configured by the admin. If the URL is a video link, it will open in the provider’s player.</p>`;layer.hidden=false;document.body.classList.add('detail-open');window.scrollTo({top:0,behavior:'smooth'});}
+  function closeDetail(){ $('detailLayer').hidden=true;document.body.classList.remove('detail-open');selected=null; }
+  function toggleSave(id){id=String(id);saved=saved.includes(id)?saved.filter(x=>x!==id):[...saved,id];saveSaved();render();if(selected&&String(selected.id)===id)$('detailSave').textContent=saved.includes(id)?'♥ Saved':'♡ Save'}
+  async function loadCategories(){try{const r=await fetch('/api/categories',{cache:'no-store'});if(!r.ok)throw Error();const d=await r.json();categories=Array.isArray(d)?d:Array.isArray(d.categories)?d.categories:[];}catch{categories=[]}render()}
+  async function loadUpdates(){const host=$('updatesGrid');try{const r=await fetch('/api/updates',{cache:'no-store'});if(!r.ok)throw Error();const d=await r.json();updates=Array.isArray(d)?d:[];}catch{updates=[]}host.innerHTML=updates.length?updates.slice().reverse().map(u=>{const img=image(u.image);return `<article class="update-card">${img?`<img class="update-image" src="${esc(img)}" alt="${esc(u.title||'Update')}" loading="lazy">`:''}<div class="update-copy"><p class="eyebrow">${esc(u.type||'UPDATE')}</p><h3>${esc(u.title||'New update')}</h3><p>${esc(u.text||'')}</p>${u.link?`<a class="open-link" href="${esc(safeUrl(u.link))}" target="_blank" rel="noopener">OPEN LINK ↗</a>`:''}</div></article>`}).join(''):'<div class="state-card"><div class="empty-icon">✦</div><p>No updates posted yet.</p><small>Admin can publish text, images and links here.</small></div>'}
+  function initName(){const input=$('learnerName'),btn=$('saveName'),note=$('greetingNote'),greeting=document.querySelector('.greeting');let name='';try{name=localStorage.getItem('venom_study_learner_name')||''}catch{}input.value=name;function update(){name=input.value.trim().slice(0,40);try{name?localStorage.setItem('venom_study_learner_name',name):localStorage.removeItem('venom_study_learner_name')}catch{}greeting.textContent=name?`GOOD MORNING, ${name.toUpperCase()}`:'GOOD MORNING,';note.textContent=name?`Keep going, ${name} — your future self will thank you!`:'Keep going. Your future self will thank you!'}btn.addEventListener('click',update);input.addEventListener('keydown',e=>{if(e.key==='Enter')update()});if(name)update()}
+  const menu=$('menuBtn'),nav=$('navLinks');menu.addEventListener('click',()=>{const o=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(o))});nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>nav.classList.remove('open')));
+  grid.addEventListener('click',e=>{const save=e.target.closest('[data-save]');if(save){e.stopPropagation();toggleSave(save.dataset.save);return}const card=e.target.closest('[data-open]');if(card)openDetail(card.dataset.open)});grid.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('[data-open]')){e.preventDefault();openDetail(e.target.dataset.open)}});savedList.addEventListener('click',e=>{const b=e.target.closest('[data-open]');if(b)openDetail(b.dataset.open)});$('backToHome').addEventListener('click',closeDetail);$('detailSave').addEventListener('click',()=>{if(selected)toggleSave(selected.id)});
+  async function loadSettings(){try{const r=await fetch('/api/settings',{cache:'no-store'});if(!r.ok)return;const s=await r.json();if(s.heroText)$('heroText').textContent=s.heroText;if(s.aboutText)$('aboutText').textContent=s.aboutText;if(s.backgroundImage){document.documentElement.style.setProperty('--anime-bg',`url("${safeUrl(s.backgroundImage)}")`)}}catch{}}
+  initName();render();loadCategories();loadUpdates();loadSettings();
 })();
