@@ -1,19 +1,36 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#08060a"><meta name="description" content="Venom Study by Priyanshu Raj — anime-inspired learning hub."><title>Venom Study — Priyanshu Raj</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050507">
+<meta name="description" content="Venom Study by Priyanshu Raj — anime-inspired learning hub.">
+<title>Venom Study — Priyanshu Raj</title>
+<link rel="icon" type="image/webp" href="venom-logo.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;1,800&family=Barlow:wght@400;500;600&family=Noto+Sans+JP:wght@900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="ambient" aria-hidden="true"></div>
-<header class="navbar"><a class="brand" href="#home" aria-label="Venom Study home"><img class="brand-mark" src="venom-logo.webp" alt=""><span>VENOM</span> STUDY</a><button class="menu-btn" id="menuBtn" type="button" aria-label="Open navigation" aria-expanded="false">☰</button><nav id="navLinks" aria-label="Main navigation"><a href="#home">Home</a><a href="#categories">Categories</a><a href="#updates">Updates</a><a href="#saved">Saved</a><a href="#about">About</a><a href="#profile">Profile</a></nav></header>
-<main id="mainView">
-<section class="hero" id="home"><div class="hero-art" aria-hidden="true"><div class="symbiote"><span class="eye eye-left"></span><span class="eye eye-right"></span><span class="mouth"><i></i><i></i><i></i><i></i><i></i><i></i></span></div><span class="tendril one"></span><span class="tendril two"></span><span class="tendril three"></span></div><div class="hero-content"><p class="eyebrow">VENOM STUDY • LEARN • GROW</p><div class="greeting-panel"><p class="greeting">GOOD MORNING,</p><label for="learnerName">Enter your name</label><div class="name-entry"><input id="learnerName" type="text" maxlength="40" placeholder="e.g. Priyanshu Raj" autocomplete="given-name"><button id="saveName" type="button">SAVE</button></div><p class="greeting-note" id="greetingNote">Keep going. Your future self will thank you!</p></div><h1 id="heroTitle">VENOM<br><span>STUDY</span></h1><p class="hero-text" id="heroText">Your anime-inspired hub for courses, study resources and daily progress.</p><div class="hero-actions"><a class="btn primary" href="#categories">Explore Categories</a></div></div><div class="scroll-indicator">SCROLL ↓</div></section>
-<section class="section" id="categories"><div class="section-head"><div><p class="eyebrow">LEARNING HUB</p><h2>Categories</h2></div><span class="count" id="categoryCount">Loading…</span></div><p class="section-sub">Choose a category to open its course page. Your existing categories are loaded from the Cloudflare API.</p><div class="cards" id="categoryGrid" aria-live="polite"><div class="state-card"><span class="loader"></span><p>Loading categories…</p></div></div></section>
-<section class="section updates-section" id="updates"><div class="section-head"><div><p class="eyebrow">FROM THE CREATOR</p><h2>Latest Updates</h2></div><span class="count">NEWS • NOTES • DROPS</span></div><p class="section-sub">New announcements, notes and photos posted by the admin.</p><div class="updates-grid" id="updatesGrid"><div class="state-card"><span class="loader"></span><p>Loading updates…</p></div></div></section>
-<section class="section saved-section" id="saved"><div class="section-head"><div><p class="eyebrow">YOUR PICKS</p><h2>Saved</h2></div></div><div id="savedList" class="saved-list"><p class="empty">No saved courses yet. Open a category and tap Save.</p></div></section>
-<section class="split-section" id="about"><div><p class="eyebrow">ABOUT</p><h2>BUILT FOR<br><span>YOUR GRIND.</span></h2></div><p id="aboutText">Venom Study is a learning platform created to help you grow your skills through courses, resources and updates.</p></section>
-<section class="profile" id="profile"><div class="avatar">PR</div><div><p class="eyebrow">PROFILE</p><h2>Priyanshu Raj</h2><p>Student • Creator • Learner</p></div></section>
-</main>
-<div id="detailLayer" class="detail-layer" hidden><div class="detail-top"><button id="backToHome" class="back-btn" type="button">← Back</button><button id="detailSave" class="detail-save" type="button">☆ Save</button></div><article id="detailContent" class="detail-content"></article></div>
-<footer>© 2026 Venom Study · Created by <strong>Priyanshu Raj</strong> <a href="admin.html">Admin</a></footer><script src="script.js" defer></script>
-</body></html>
+<div id="app">
+  <div id="hd"></div>
+  <main id="main" aria-live="polite"></main>
+  <nav id="nav" aria-label="Main"></nav>
+  <div id="menu" role="menu"></div>
+  <div id="toast" role="status"></div>
+
+  <!-- Loading screen -->
+  <div id="splash" class="scr">
+    <img id="sl" class="lg big" src="venom-logo.webp" width="170" alt="Venom Study logo">
+    <h1>VENOM<span>STUDY</span></h1>
+    <p class="mt">LEARN · GROW · BE BETTER</p>
+    <div class="ld"><i></i></div>
+    <p style="font-size:14px;margin-top:6px">Loading…</p>
+    <p class="foot"><span class="own" style="display:inline">Owner</span><br><b id="so" style="font:italic 800 26px/1.2 'Barlow Condensed',sans-serif;color:#fff">Priyanshu Raj</b> <span style="color:#f2c230">♛</span><br><span style="opacity:.7">© 2025 Venom Study</span></p>
+  </div>
+</div>
+<noscript><p style="color:#fff;padding:24px">Venom Study needs JavaScript to run.</p></noscript>
+<script src="script.js" defer></script>
+</body>
+</html>
