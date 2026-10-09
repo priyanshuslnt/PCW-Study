@@ -94,6 +94,7 @@
     render();
   }
 
+
   function initNav() {
     const menu = $("menuBtn");
     const nav = $("navLinks");
@@ -113,7 +114,31 @@
     if (button) toggleSave(button.dataset.save);
   });
 
-  initNav();
+  function initLearnerName() {
+    const input = $("learnerName");
+    const save = $("saveName");
+    const note = $("greetingNote");
+    if (!input || !save || !note) return;
+    let name = "";
+    try { name = localStorage.getItem("venom_study_learner_name") || ""; } catch {}
+    input.value = name;
+    const update = () => {
+      const clean = input.value.trim().slice(0, 40);
+      try {
+        if (clean) localStorage.setItem("venom_study_learner_name", clean);
+        else localStorage.removeItem("venom_study_learner_name");
+      } catch {}
+      note.textContent = clean ? `Keep going, ${clean} — your future self will thank you!` : "Your study journey starts here.";
+      const greeting = document.querySelector(".greeting");
+      if (greeting) greeting.textContent = clean ? `GOOD MORNING, ${clean.toUpperCase()}` : "GOOD MORNING,";
+    };
+    save.addEventListener("click", update);
+    input.addEventListener("keydown", event => { if (event.key === "Enter") update(); });
+    if (name) update();
+  }
+
+  initLearnerName();\n  initNav();
   render();
   loadCategories();
+
 })();
