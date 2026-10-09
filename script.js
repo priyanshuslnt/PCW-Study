@@ -200,7 +200,7 @@
     const a = b.dataset.a;
     if (a !== 'menu') menu.style.display = 'none';
     if (a === 'menu') {
-      menu.innerHTML = `<a role="menuitem" href="#/about">About app</a><a role="menuitem" href="admin.html">Admin panel</a><button role="menuitem" data-a="refresh">Refresh</button>`;
+      menu.innerHTML = `<a role="menuitem" href="#/about">About app</a><button role="menuitem" data-a="refresh">Refresh</button>`;
       menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
     } else if (a === 'refresh') { render(true); loadAll(); }
     else if (a === 'toast') toast(b.dataset.m);
